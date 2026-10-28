@@ -9,6 +9,22 @@ export const CATEGORIES = [
 
 export type Category = (typeof CATEGORIES)[number];
 
+export type PostDetails = {
+  stipend?: string;
+  duration?: string;
+  workType?: string;
+  skills?: string;
+  joiningDate?: string;
+  theme?: string;
+  teamSize?: string;
+  prize?: string;
+  eventDate?: string;
+  awardAmount?: string;
+  incomeLimit?: string;
+  academicYear?: string;
+  studyLevel?: string;
+};
+
 export type Post = {
   id: string;
   title: string;
@@ -23,6 +39,7 @@ export type Post = {
   applicationFee: string;
   applyLink: string;
   notificationLink: string;
+  details: PostDetails;
   createdAt: string;
 };
 

@@ -43,6 +43,7 @@ function postView(post) {
     applicationFee: post.applicationFee,
     applyLink: post.applyLink,
     notificationLink: post.notificationLink,
+    details: post.details || {},
     createdAt: post.createdAt,
   };
 }

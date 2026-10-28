@@ -18,6 +18,21 @@ const postSchema = new mongoose.Schema({
   applicationFee: { type: String, required: true, trim: true },
   applyLink: { type: String, required: true },
   notificationLink: { type: String, default: '' },
+  details: {
+    stipend: { type: String, default: '' },
+    duration: { type: String, default: '' },
+    workType: { type: String, default: '' },
+    skills: { type: String, default: '' },
+    joiningDate: { type: String, default: '' },
+    theme: { type: String, default: '' },
+    teamSize: { type: String, default: '' },
+    prize: { type: String, default: '' },
+    eventDate: { type: String, default: '' },
+    awardAmount: { type: String, default: '' },
+    incomeLimit: { type: String, default: '' },
+    academicYear: { type: String, default: '' },
+    studyLevel: { type: String, default: '' },
+  },
   expiresAt: { type: Date, required: true },
 }, { timestamps: true });
 

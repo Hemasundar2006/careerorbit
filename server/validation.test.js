@@ -24,3 +24,19 @@ test('invalid dates and unsafe links cannot be published', () => {
 test('MongoDB has a TTL index for automatic deletion', () => {
   assert.ok(Post.schema.indexes().some(([keys, options]) => keys.expiresAt === 1 && options.expireAfterSeconds === 0));
 });
+
+test('category fields are kept only for the selected form', () => {
+  const internship = postInput.parse({ ...sample, ageLimit: '', details: { stipend: '₹15,000/month', theme: 'Unrelated theme' } });
+  assert.equal(internship.ageLimit, 'Not specified');
+  assert.deepEqual(internship.details, { stipend: '₹15,000/month' });
+
+  const hackathon = postInput.parse({ ...sample, category: 'Hackathon', details: { teamSize: '2–4', prize: '₹1 lakh' } });
+  assert.deepEqual(hackathon.details, { teamSize: '2–4', prize: '₹1 lakh' });
+
+  const scholarship = postInput.parse({ ...sample, category: 'Scholarship', details: { awardAmount: '₹50,000', academicYear: '2026–27' } });
+  assert.deepEqual(scholarship.details, { awardAmount: '₹50,000', academicYear: '2026–27' });
+});
+
+test('job posts still require an age limit', () => {
+  assert.equal(postInput.safeParse({ ...sample, category: 'Central Govt Job', ageLimit: '' }).success, false);
+});
