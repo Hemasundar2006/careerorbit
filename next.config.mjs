@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-const apiOrigin = process.env.API_ORIGIN || 'http://localhost:4000';
+const apiOrigin = (process.env.API_ORIGIN || 'https://careerorbit-yef6.onrender.com').replace(/\/+$/, '');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
