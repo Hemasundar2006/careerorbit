@@ -2,8 +2,8 @@ services:
   - type: web
     runtime: node
     name: careerorbit
-    buildCommand: npm ci && npm run build
-    startCommand: npm start
+    buildCommand: npm install
+    startCommand: npm run start:api
     initialDeployHook: npm run admin:setup
     healthCheckPath: /api/health
     envVars:
