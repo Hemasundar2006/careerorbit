@@ -7,7 +7,7 @@ const { required } = require('./config');
 async function setup() {
   const email = required('ADMIN_EMAIL').trim().toLowerCase();
   const password = required('ADMIN_PASSWORD');
-  if (password.length < 12) throw new Error('ADMIN_PASSWORD must be at least 12 characters.');
+  if (password.length < 10) throw new Error('ADMIN_PASSWORD must be at least 10 characters.');
   if (required('SESSION_SECRET').length < 32) throw new Error('SESSION_SECRET must be at least 32 characters.');
   await mongoose.connect(required('MONGODB_URI'), { dbName: 'opportunity_hub' });
   const passwordHash = await bcrypt.hash(password, 12);
