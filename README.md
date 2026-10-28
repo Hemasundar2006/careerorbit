@@ -15,6 +15,8 @@ A public opportunity board for government and private jobs, internships, hackath
 3. Run `npm run admin:setup` once to create the admin account. Running it again updates that one account's email and password. Remove `ADMIN_PASSWORD` from `.env` after setup if you do not need to reset it.
 4. Run `npm run dev`. Open `http://localhost:3000` for the public site or `http://localhost:3000/admin` for the dashboard.
 
+If your local DNS server rejects MongoDB Atlas SRV lookups, set `MONGODB_DNS_SERVERS=8.8.8.8` in your local `.env`. Leave it unset on Render unless that host also needs a custom resolver.
+
 In development, Next.js forwards `/api/*` to Express on port 4000. For a Node.js host in production, run `npm run build` and `npm start`. The production entry point serves both Next.js and Express on the host's `PORT`, so one Node service is enough. Configure a production `SESSION_SECRET`, MongoDB network access, and HTTPS before making the site public. Separate-service hosting is also supported with `start:web`, `start:api`, and `API_ORIGIN` pointing to Express.
 
 ### Deploy on Render
