@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Brand from '@/components/Brand';
+import ShareButton from '@/components/ShareButton';
 import CategoryDetails from '@/components/CategoryDetails';
 import { api, CATEGORY_COLORS, daysLeft, formatDate, type Post } from '@/lib/types';
 
@@ -35,7 +36,7 @@ export default function OpportunityDetail() {
             <div className="detail-section"><h2>Important dates</h2><div className="dates-row"><div><span className="date-symbol">↗</span><small>{post.category === 'Hackathon' ? 'REGISTRATION OPENS' : 'APPLICATION OPENS'}</small><strong>{formatDate(post.startDate)}</strong></div><div><span className="date-symbol">◷</span><small>{post.category === 'Hackathon' ? 'REGISTRATION CLOSES' : 'LAST DATE TO APPLY'}</small><strong>{formatDate(post.lastDate)}</strong></div></div>{post.importantDates && <div className="important-note"><strong>Other important dates</strong><p>{post.importantDates}</p></div>}</div>
             {post.notificationLink && <div className="detail-section"><h2>Official document</h2><p className="detail-help">Review the official document before applying.</p><a className="notification-link" href={post.notificationLink} target="_blank" rel="noopener noreferrer">Open {post.category === 'Hackathon' ? 'rules' : post.category === 'Scholarship' ? 'guidelines' : 'notification'} PDF ↗</a></div>}
           </article>
-          <aside className="apply-panel"><div className="apply-panel-top"><span className="live-dot" /> {daysLeft(post.startDate) > 0 ? 'APPLICATION OPENS SOON' : 'APPLICATION OPEN'}</div><h2>Ready to take the next step?</h2><p>Apply through the official {post.organization} website.</p><div className="apply-deadline"><small>DEADLINE</small><strong>{formatDate(post.lastDate)}</strong><span>{daysLeft(post.lastDate) === 0 ? 'Closes today' : `${daysLeft(post.lastDate)} days remaining`}</span></div><a className="apply-button" href={post.applyLink} target="_blank" rel="noopener noreferrer">{daysLeft(post.startDate) > 0 ? 'Visit official site' : 'Apply on official site'} <span>↗</span></a><small className="external-note">You will be taken to the official application page.</small></aside>
+          <aside className="apply-panel"><div className="apply-panel-top"><span className="live-dot" /> {daysLeft(post.startDate) > 0 ? 'APPLICATION OPENS SOON' : 'APPLICATION OPEN'}</div><h2>Ready to take the next step?</h2><p>Apply through the official {post.organization} website.</p><div className="apply-deadline"><small>DEADLINE</small><strong>{formatDate(post.lastDate)}</strong><span>{daysLeft(post.lastDate) === 0 ? 'Closes today' : `${daysLeft(post.lastDate)} days remaining`}</span></div><a className="apply-button" href={post.applyLink} target="_blank" rel="noopener noreferrer">{daysLeft(post.startDate) > 0 ? 'Visit official site' : 'Apply on official site'} <span>↗</span></a><ShareButton title={post.title} path={`/opportunities/${post.id}`} /><small className="external-note">You will be taken to the official application page.</small></aside>
         </div>
       </>}
     </main>

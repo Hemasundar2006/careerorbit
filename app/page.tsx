@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import Brand from '@/components/Brand';
+import ShareButton from '@/components/ShareButton';
 import ListingCard from '@/components/ListingCard';
 import { api, CATEGORIES, CATEGORY_COLORS, type Category, type Post, type Stats } from '@/lib/types';
 
@@ -66,7 +67,7 @@ export default function Home() {
             <a href="#opportunities">Explore opportunities</a>
             <a href="#categories">Categories</a>
           </nav>
-          <Link href="/admin" className="header-admin">Admin login <span>↗</span></Link>
+          <div className="header-actions"><ShareButton compact /><Link href="/admin" className="header-admin">Admin login <span>↗</span></Link></div>
         </header>
 
         <section className="hero container">

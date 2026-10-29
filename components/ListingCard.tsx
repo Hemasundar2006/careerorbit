@@ -1,3 +1,4 @@
+import ShareButton from './ShareButton';
 import Link from 'next/link';
 import { CATEGORY_COLORS, daysLeft, formatDate, type Post } from '@/lib/types';
 
@@ -18,7 +19,7 @@ export default function ListingCard({ post }: { post: Post }) {
       </div>
       <div className="card-bottom">
         <span className="card-eligibility">{post.eligibility}</span>
-        <Link href={`/opportunities/${post.id}`} className="card-arrow" aria-label={`View ${post.title}`}>↗</Link>
+        <ShareButton title={post.title} path={`/opportunities/${post.id}`} compact /><Link href={`/opportunities/${post.id}`} className="card-arrow" aria-label={`View ${post.title}`}>↗</Link>
       </div>
     </article>
   );
