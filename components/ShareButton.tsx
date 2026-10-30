@@ -33,8 +33,15 @@ export default function ShareButton({ title = 'CareerOrbit — discover your nex
     }
   }
 
+  async function copy() {
+    const url = path ? new URL(path, window.location.origin).href : window.location.href;
+    await navigator.clipboard?.writeText(url);
+    setStatus('Link copied!');
+  }
+
   return <div className={`share-control${compact ? ' share-compact' : ''}`}>
     <button type="button" className="share-button" onClick={() => void share()} disabled={busy} aria-label={`Share ${title}`}><span aria-hidden="true">↗</span> {busy ? 'Sharing…' : 'Share'}</button>
+    {!compact && <button type="button" className="share-button copy-button" onClick={() => void copy()}><span aria-hidden="true">⧉</span> Copy link</button>}
     <span className="share-status" role="status">{status}</span>
     {fallbackUrl && <input className="share-link" aria-label="Shareable link" value={fallbackUrl} readOnly onFocus={(event) => event.currentTarget.select()} />}
   </div>;

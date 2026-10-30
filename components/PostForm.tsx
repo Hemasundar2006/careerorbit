@@ -76,6 +76,7 @@ export default function PostForm({ draft, setDraft, onSave, onCancel, busy, edit
         <label>{locationLabel} <b>*</b><input value={draft.location} onChange={(event) => set('location', event.target.value)} required placeholder={draft.category === 'Scholarship' ? 'e.g. Pan-India, Telangana' : 'e.g. Hyderabad, Pan-India, Remote'} /></label>
         <label>{eligibilityLabel} <b>*</b><input value={draft.eligibility} onChange={(event) => set('eligibility', event.target.value)} required placeholder={draft.category === 'Scholarship' ? 'e.g. Class 12 pass with 60% marks' : 'e.g. B.Tech 2024–2026'} /></label>
         <label className="full">Age limit {job ? <b>*</b> : <span>(optional)</span>}<input value={draft.ageLimit} onChange={(event) => set('ageLimit', event.target.value)} required={job} placeholder={job ? 'e.g. 18–30 years, relaxations as applicable' : 'e.g. No age limit or 18–25 years'} /></label>
+        <label className="full">Eligibility tags <span>(comma separated)</span><input value={(draft.eligibilityTags || []).join(', ')} onChange={(event) => set('eligibilityTags', event.target.value.split(',').map((tag) => tag.trim()).filter(Boolean))} placeholder="e.g. Students, Freshers, Graduates" /></label>
       </div>
 
       {extra.length > 0 && <>

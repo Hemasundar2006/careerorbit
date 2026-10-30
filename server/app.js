@@ -5,7 +5,7 @@ const rateLimit = require('express-rate-limit');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
-const { Admin, Post, CATEGORIES } = require('./models');
+const { Admin, Post, View, Report, CATEGORIES } = require('./models');
 const { postInput } = require('./validation');
 const { required } = require('./config');
 
@@ -36,6 +36,7 @@ function postView(post) {
     organization: post.organization,
     location: post.location,
     eligibility: post.eligibility,
+    eligibilityTags: post.eligibilityTags || [],
     ageLimit: post.ageLimit,
     startDate: post.startDate,
     lastDate: post.lastDate,
@@ -116,7 +117,18 @@ app.get('/api/stats', asyncRoute(async (_req, res) => {
 app.get('/api/posts/:id', validId, asyncRoute(async (req, res) => {
   const post = await Post.findOne({ _id: req.params.id, ...active() }).lean();
   if (!post) return res.status(404).json({ error: 'Post not found or deadline passed.' });
-  res.json({ post: postView(post) });
+  await View.create({ postId: post._id, category: post.category });
+  const related = await Post.find({ ...active(), category: post.category, _id: { $ne: post._id } }).sort({ createdAt: -1 }).limit(3).lean();
+  res.json({ post: postView(post), related: related.map(postView) });
+}));
+
+app.post('/api/posts/:id/report', validId, requireJson, asyncRoute(async (req, res) => {
+  const post = await Post.findOne({ _id: req.params.id, ...active() });
+  if (!post) return res.status(404).json({ error: 'Post not found.' });
+  const reason = String(req.body?.reason || '').trim().slice(0, 500);
+  if (reason.length < 3) return res.status(400).json({ error: 'Please tell us what looks incorrect.' });
+  await Report.create({ postId: post._id, reason });
+  res.status(201).json({ ok: true });
 }));
 
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: 'draft-7', legacyHeaders: false });
@@ -141,6 +153,17 @@ app.post('/api/auth/logout', requireAdmin, (_req, res) => {
 app.get('/api/admin/posts', requireAdmin, asyncRoute(async (_req, res) => {
   const posts = await Post.find(active()).sort({ createdAt: -1 }).lean();
   res.json({ posts: posts.map(postView), total: posts.length });
+}));
+
+app.get('/api/admin/analytics', requireAdmin, asyncRoute(async (_req, res) => {
+  const [views, reports, topPosts, grouped] = await Promise.all([
+    View.countDocuments(), Report.countDocuments(),
+    View.aggregate([{ $group: { _id: '$postId', views: { $sum: 1 } } }, { $sort: { views: -1 } }, { $limit: 5 }, { $lookup: { from: 'posts', localField: '_id', foreignField: '_id', as: 'post' } }, { $unwind: '$post' }, { $project: { _id: 0, id: '$_id', title: '$post.title', views: 1 } }]),
+    View.aggregate([{ $group: { _id: '$category', views: { $sum: 1 } } }]),
+  ]);
+  const byCategory = Object.fromEntries(CATEGORIES.map((category) => [category, 0]));
+  for (const item of grouped) byCategory[item._id] = item.views;
+  res.json({ views, reports, topPosts, byCategory });
 }));
 
 app.post('/api/admin/posts', requireAdmin, requireJson, asyncRoute(async (req, res) => {

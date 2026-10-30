@@ -23,6 +23,7 @@ const postInput = z.object({
   organization: z.string().trim().min(2).max(120),
   location: z.string().trim().min(2).max(120),
   eligibility: z.string().trim().min(2).max(500),
+  eligibilityTags: z.array(z.string().trim().min(1).max(40)).max(8).default([]),
   ageLimit: z.string().trim().max(300).default(''),
   startDate: dateOnly,
   lastDate: dateOnly,

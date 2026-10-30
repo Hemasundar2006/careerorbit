@@ -4,10 +4,10 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import Brand from '@/components/Brand';
 import PostForm from '@/components/PostForm';
-import { api, CATEGORIES, CATEGORY_COLORS, daysLeft, formatDate, type Post, type PostInput, type Stats } from '@/lib/types';
+import { api, CATEGORIES, CATEGORY_COLORS, daysLeft, formatDate, type Post, type PostInput, type Stats, type Analytics } from '@/lib/types';
 
 const EMPTY_POST: PostInput = {
-  title: '', category: 'Central Govt Job', organization: '', location: '', eligibility: '', ageLimit: '',
+  title: '', category: 'Central Govt Job', organization: '', location: '', eligibility: '', eligibilityTags: [], ageLimit: '',
   startDate: '', lastDate: '', importantDates: '', applicationFee: '', applyLink: '', notificationLink: '', details: {},
 };
 
@@ -26,14 +26,16 @@ export default function AdminPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
 
   const loadDashboard = useCallback(async () => {
     try {
-      const [postData, statsData] = await Promise.all([
-        api<{ posts: Post[] }>('/api/admin/posts'), api<Stats>('/api/stats'),
+      const [postData, statsData, analyticsData] = await Promise.all([
+        api<{ posts: Post[] }>('/api/admin/posts'), api<Stats>('/api/stats'), api<Analytics>('/api/admin/analytics'),
       ]);
       setPosts(postData.posts);
       setStats(statsData);
+      setAnalytics(analyticsData);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not load dashboard.');
     }
@@ -113,6 +115,7 @@ export default function AdminPage() {
         <section className="admin-stat-grid"><div className="admin-stat"><span>ACTIVE POSTS</span><strong>{stats?.total ?? posts.length}</strong><small>Visible on the public site ↗</small></div><div className="admin-stat"><span>CLOSING SOON</span><strong>{stats?.closingSoon ?? 0}</strong><small>Within the next 7 days</small></div><div className="admin-stat"><span>CATEGORIES</span><strong>{CATEGORIES.length}</strong><small>Across all opportunities</small></div></section>
         <section className="admin-table-section"><div className="admin-section-head"><div><span className="kicker">MANAGE LISTINGS</span><h2>Published opportunities <span>({posts.length})</span></h2></div><button onClick={() => void loadDashboard()} className="refresh-button">↻ Refresh</button></div>{posts.length ? <div className="admin-table-wrap" tabIndex={0} role="region" aria-label="Published opportunities; scroll horizontally to see all columns"><table><thead><tr><th>OPPORTUNITY</th><th>CATEGORY</th><th>DEADLINE</th><th>STATUS</th><th>ACTIONS</th></tr></thead><tbody>{posts.map((post) => <tr key={post.id}><td><strong>{post.title}</strong><small>{post.organization} · {post.location}</small></td><td><span className={`category-badge ${CATEGORY_COLORS[post.category]}`}>{post.category}</span></td><td>{formatDate(post.lastDate)}</td><td><span className="status-open"><i /> {daysLeft(post.startDate) > 0 ? 'Upcoming' : 'Open'}</span></td><td><div className="table-actions"><button onClick={() => startEdit(post)}>Edit</button><button className="delete-action" disabled={busy} onClick={() => void deletePost(post)}>Delete</button></div></td></tr>)}</tbody></table></div> : <div className="admin-empty"><span>✳</span><h3>No posts yet</h3><p>Create your first opportunity to make it visible on the public website.</p><button className="admin-primary" onClick={startCreate}>＋ Create first post</button></div>}</section>
         <section className="admin-category-section"><h2>Posts by category</h2><div className="admin-category-grid">{CATEGORIES.map((category) => <div key={category}><span className={`category-badge ${CATEGORY_COLORS[category]}`}>{category}</span><strong>{stats?.byCategory[category] ?? 0}</strong></div>)}</div></section>
+        <section className="admin-category-section"><h2>Visitor analytics</h2><div className="admin-stat-grid"><div className="admin-stat"><span>PAGE VIEWS</span><strong>{analytics?.views ?? 0}</strong><small>Opportunity detail views</small></div><div className="admin-stat"><span>REPORTS</span><strong>{analytics?.reports ?? 0}</strong><small>User feedback reports</small></div></div>{analytics?.topPosts.length ? <div className="admin-table-wrap analytics-list"><table><thead><tr><th>POPULAR OPPORTUNITY</th><th>VIEWS</th></tr></thead><tbody>{analytics.topPosts.map((item) => <tr key={item.id}><td>{item.title}</td><td>{item.views}</td></tr>)}</tbody></table></div> : null}</section>
       </> : <PostForm draft={draft} setDraft={setDraft} onSave={savePost} onCancel={() => { setView('overview'); setError(''); }} busy={busy} editing={Boolean(editingId)} />}
     </main>
   </div>;

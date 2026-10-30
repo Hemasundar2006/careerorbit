@@ -32,6 +32,7 @@ export type Post = {
   organization: string;
   location: string;
   eligibility: string;
+  eligibilityTags: string[];
   ageLimit: string;
   startDate: string;
   lastDate: string;
@@ -50,6 +51,8 @@ export type Stats = {
   closingSoon: number;
   byCategory: Record<Category, number>;
 };
+
+export type Analytics = { views: number; reports: number; topPosts: Array<{ id: string; title: string; views: number }>; byCategory: Record<Category, number> };
 
 export const CATEGORY_COLORS: Record<Category, string> = {
   'Central Govt Job': 'blue',
@@ -73,6 +76,11 @@ export function daysLeft(value: string) {
   const today = Date.parse(`${todayInIndia}T00:00:00Z`);
   const last = Date.parse(`${value}T00:00:00Z`);
   return Math.max(0, Math.round((last - today) / 86400000));
+}
+
+export function applicationStatus(post: Pick<Post, 'startDate' | 'lastDate'>) {
+  if (daysLeft(post.startDate) > 0) return 'Upcoming';
+  return daysLeft(post.lastDate) <= 7 ? 'Closing Soon' : 'Open';
 }
 
 export async function api<T>(url: string, options?: RequestInit): Promise<T> {

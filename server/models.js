@@ -11,6 +11,7 @@ const postSchema = new mongoose.Schema({
   organization: { type: String, required: true, trim: true },
   location: { type: String, required: true, trim: true },
   eligibility: { type: String, required: true, trim: true },
+  eligibilityTags: { type: [String], default: [] },
   ageLimit: { type: String, required: true, trim: true },
   startDate: { type: String, required: true },
   lastDate: { type: String, required: true },
@@ -47,8 +48,13 @@ const adminSchema = new mongoose.Schema({
   sessionVersion: { type: String, required: true },
 }, { timestamps: true });
 
+const viewSchema = new mongoose.Schema({ postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: true }, category: String }, { timestamps: true });
+const reportSchema = new mongoose.Schema({ postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: true }, reason: { type: String, required: true, maxlength: 500 } }, { timestamps: true });
+
 module.exports = {
   CATEGORIES,
   Post: mongoose.models.Post || mongoose.model('Post', postSchema),
+  View: mongoose.models.View || mongoose.model('View', viewSchema),
+  Report: mongoose.models.Report || mongoose.model('Report', reportSchema),
   Admin: mongoose.models.Admin || mongoose.model('Admin', adminSchema),
 };
